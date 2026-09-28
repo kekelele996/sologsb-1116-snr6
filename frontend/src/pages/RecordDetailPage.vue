@@ -51,6 +51,7 @@ const pointDraft = reactive<CollectPoint>({
   vegetation: '针阔混交林',
   substrate: '落叶层',
   companionTrees: '',
+  formerNames: [],
   collectDate: '',
   collector: ''
 })

@@ -4,7 +4,7 @@ import Dexie, { type Table } from 'dexie'
 import type { CollectPoint, FungusRecord, IdentifyLog, SporePrint } from '@/types'
 
 /** IndexedDB 数据结构版本号 */
-export const SCHEMA_VERSION = 2
+export const SCHEMA_VERSION = 3
 
 export interface MetaRow {
   key: string
@@ -29,7 +29,7 @@ class FungiGuideDb extends Dexie {
       meta: 'key'
     })
     // v2：新增「菌肉变色反应」字段，迁移时为历史条目补齐默认值（不变色）
-    this.version(SCHEMA_VERSION)
+    this.version(2)
       .stores({
         records: 'id, code, pointId, attachment, capShape',
         spores: 'id, recordId, color, observeDate',
@@ -44,6 +44,25 @@ class FungiGuideDb extends Dexie {
           .modify((record) => {
             if (!record.fleshReaction) {
               record.fleshReaction = '不变色'
+            }
+          })
+      })
+    // v3：采集点支持合并，新增「曾用名」字段，迁移时为历史采集点补齐空数组
+    this.version(SCHEMA_VERSION)
+      .stores({
+        records: 'id, code, pointId, attachment, capShape',
+        spores: 'id, recordId, color, observeDate',
+        points: 'id, name, substrate, vegetation',
+        identifies: 'id, recordId, conclusion, date',
+        meta: 'key'
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table<CollectPoint, string>('points')
+          .toCollection()
+          .modify((point) => {
+            if (!Array.isArray(point.formerNames)) {
+              point.formerNames = []
             }
           })
       })
@@ -99,6 +118,7 @@ export async function seedDemoData(): Promise<void> {
       vegetation: '针阔混交林',
       substrate: '落叶层',
       companionTrees: '辽东栎、油松',
+      formerNames: [],
       collectDate: today,
       collector: '沈禾'
     },
@@ -111,6 +131,7 @@ export async function seedDemoData(): Promise<void> {
       vegetation: '常绿阔叶林',
       substrate: '腐木',
       companionTrees: '麻栎、枫香',
+      formerNames: [],
       collectDate: today,
       collector: '沈禾'
     }

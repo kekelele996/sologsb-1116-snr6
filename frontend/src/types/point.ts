@@ -17,6 +17,8 @@ export interface CollectPoint {
   substrate: Substrate
   /** 伴生树种 */
   companionTrees: string
+  /** 曾用名：被并入本点的其他采集点名称（含本点历史名称），合并时保留 */
+  formerNames: string[]
   collectDate: string
   collector: string
 }
