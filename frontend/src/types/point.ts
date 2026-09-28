@@ -19,4 +19,6 @@ export interface CollectPoint {
   companionTrees: string
   collectDate: string
   collector: string
+  /** 合并进来的采集点原称（含历次被并点自带的原称），旧名称不会丢失 */
+  aliases: string[]
 }

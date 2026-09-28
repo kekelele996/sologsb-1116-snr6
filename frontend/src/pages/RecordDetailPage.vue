@@ -52,7 +52,8 @@ const pointDraft = reactive<CollectPoint>({
   substrate: '落叶层',
   companionTrees: '',
   collectDate: '',
-  collector: ''
+  collector: '',
+  aliases: []
 })
 
 watch(
